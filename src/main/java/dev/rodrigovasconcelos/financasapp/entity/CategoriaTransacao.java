@@ -20,4 +20,6 @@ public class CategoriaTransacao {
     private String nome;
 
     private String descricao;
+
+    private Long usuarioId;
 }
