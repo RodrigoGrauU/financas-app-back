@@ -9,7 +9,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @Getter
@@ -26,10 +29,17 @@ public class Transacao {
     @ManyToOne(optional = false)
     private Carteira carteira;
 
+    private BigDecimal valor;
+
     private String descricao;
 
     @CreationTimestamp
     private OffsetDateTime dataCriacao;
+
+    @UpdateTimestamp
+    private OffsetDateTime dataAlteracao;
+
+    private LocalDate dataTransacao;
 
     @Enumerated(EnumType.STRING)
     private TipoTransacao tipoTransacao;

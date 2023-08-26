@@ -13,4 +13,8 @@ public enum TipoTransacao {
     public String getSiglaTransacao() {
         return siglaTransacao;
     }
+
+    public static TipoTransacao[] listaTipos() {
+        return TipoTransacao.values();
+    }
 }

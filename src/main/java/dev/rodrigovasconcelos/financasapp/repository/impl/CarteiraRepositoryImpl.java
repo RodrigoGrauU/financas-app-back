@@ -20,7 +20,7 @@ public class CarteiraRepositoryImpl implements CarteiraRepositoryQueries {
     public Set<AnoTransacaoDto> find(Long... carteirasId) {
         Set<AnoTransacaoDto> listaAnoTransacaoDtos = new HashSet<>();
         for (Long carteiraId : carteirasId) {
-            TypedQuery<Integer> query = entityManager.createQuery("SELECT DISTINCT EXTRACT(YEAR FROM t.dataCriacao) " +
+            TypedQuery<Integer> query = entityManager.createQuery("SELECT DISTINCT EXTRACT(YEAR FROM t.dataTransacao) " +
                     "FROM transacoes t WHERE t.carteira.id = :idCarteira", Integer.class);
             query.setParameter("idCarteira", carteiraId);
             List<Integer> anosDisponiveis = query.getResultList();
@@ -29,8 +29,8 @@ public class CarteiraRepositoryImpl implements CarteiraRepositoryQueries {
                 AnoTransacaoDto anoTransacaoDto = new AnoTransacaoDto();
                 anoTransacaoDto.setAno(ano);
 
-                TypedQuery<Integer> mesesDisponivesQuery = entityManager.createQuery("SELECT DISTINCT EXTRACT(MONTH FROM t.dataCriacao) FROM transacoes t " +
-                        "WHERE t.carteira.id = :idCarteira AND EXTRACT(YEAR FROM t.dataCriacao) = :anoDisponivel", Integer.class);
+                TypedQuery<Integer> mesesDisponivesQuery = entityManager.createQuery("SELECT DISTINCT EXTRACT(MONTH FROM t.dataTransacao) FROM transacoes t " +
+                        "WHERE t.carteira.id = :idCarteira AND EXTRACT(YEAR FROM t.dataTransacao) = :anoDisponivel", Integer.class);
                 mesesDisponivesQuery.setParameter("idCarteira", carteiraId);
                 mesesDisponivesQuery.setParameter("anoDisponivel", ano);
 

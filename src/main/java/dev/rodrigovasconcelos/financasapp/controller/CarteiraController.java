@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
@@ -17,7 +16,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/v1/carteiras")
 @AllArgsConstructor
-public class CateiraController {
+public class CarteiraController {
 
     private CarteiraService carteiraService;
 

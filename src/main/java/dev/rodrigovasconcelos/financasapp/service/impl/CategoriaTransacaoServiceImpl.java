@@ -52,7 +52,7 @@ public class CategoriaTransacaoServiceImpl implements CategoriaTransacaoService 
         categoriaTransacaoRepository.deleteById(categoriaTransacaoId);
     }
 
-    private CategoriaTransacao buscarOuFalhar(Long categoriaTransacaoId) {
+    public CategoriaTransacao buscarOuFalhar(Long categoriaTransacaoId) {
         return categoriaTransacaoRepository.findById(categoriaTransacaoId).orElseThrow(RuntimeException::new);
     }
 
