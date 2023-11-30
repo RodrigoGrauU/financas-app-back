@@ -9,5 +9,5 @@ import java.util.Set;
 
 @Repository
 public interface CarteiraRepository extends JpaRepository<Carteira, Long>, CarteiraRepositoryQueries {
-    Optional<Set<Carteira>> findByUserId(Long User);
+    Optional<Set<Carteira>> findByUsuarioId(Long id);
 }

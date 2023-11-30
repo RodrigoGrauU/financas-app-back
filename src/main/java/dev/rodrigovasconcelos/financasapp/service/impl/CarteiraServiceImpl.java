@@ -4,6 +4,7 @@ import dev.rodrigovasconcelos.financasapp.dto.AnoTransacaoDto;
 import dev.rodrigovasconcelos.financasapp.dto.CarteiraComMesesAnoDto;
 import dev.rodrigovasconcelos.financasapp.dto.CarteiraDto;
 import dev.rodrigovasconcelos.financasapp.entity.Carteira;
+import dev.rodrigovasconcelos.financasapp.entity.Usuario;
 import dev.rodrigovasconcelos.financasapp.mapper.CarteiraMapper;
 import dev.rodrigovasconcelos.financasapp.repository.CarteiraRepository;
 import dev.rodrigovasconcelos.financasapp.service.CarteiraService;
@@ -19,15 +20,15 @@ import java.util.Set;
 public class CarteiraServiceImpl implements CarteiraService {
 
     private CarteiraRepository carteiraRepository;
+    private UsuarioServiceImpl usuarioService;
 
     @Override
     @Transactional
-    public CarteiraDto salvarCarteira(CarteiraDto carteiraDto) {
+    public CarteiraDto salvarCarteira(CarteiraDto carteiraDto, String username) {
         Carteira carteira = CarteiraMapper.INSTANCE.CarteiraDtoToCarteira(carteiraDto);
-        // TODO - REMOVER MOCK USER
         if(carteira != null) {
-            Long userId = 1L;
-            carteira.setUserId(userId);
+            Usuario usuario = usuarioService.findUserByUsername(username);
+            carteira.setUsuario(usuario);
             Carteira carteiraSalva = carteiraRepository.save(carteira);
             return CarteiraMapper.INSTANCE.carteiraToCarteiraDto(carteiraSalva);
         }
@@ -35,8 +36,9 @@ public class CarteiraServiceImpl implements CarteiraService {
     }
 
     @Override
-    public Set<CarteiraComMesesAnoDto> listaCarteiras(Long usuarioId) {
-        Set<Carteira> carteiras = carteiraRepository.findByUserId(usuarioId).orElse(new HashSet<>());
+    public Set<CarteiraComMesesAnoDto> listaCarteiras(String username) {
+        Usuario usuario = usuarioService.findUserByUsername(username);
+        Set<Carteira> carteiras = carteiraRepository.findByUsuarioId(usuario.getId()).orElse(new HashSet<>());
         Set<CarteiraComMesesAnoDto> carteirasDto = new HashSet<>();
         carteiras.forEach(carteira -> carteirasDto.add(CarteiraMapper.INSTANCE.carteiraToCarteiraComMesesAnoDto(carteira)));
 

@@ -8,9 +8,9 @@ import java.util.Set;
 
 public interface CarteiraService {
 
-    CarteiraDto salvarCarteira(CarteiraDto carteira);
+    CarteiraDto salvarCarteira(CarteiraDto carteira, String username);
 
-    Set<CarteiraComMesesAnoDto> listaCarteiras(Long usuarioId);
+    Set<CarteiraComMesesAnoDto> listaCarteiras(String username);
 
     void removerCarteira(Long carteiraId);
 
