@@ -10,6 +10,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,9 +27,11 @@ public class LoginController {
     private final AuthenticationManager authenticationManager;
     private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
     private SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
+    private UserDetailsManager userDetailsManager;
 
-    public LoginController(AuthenticationManager authenticationManager) {
+    public LoginController(AuthenticationManager authenticationManager, UserDetailsManager userDetailsManager) {
         this.authenticationManager = authenticationManager;
+        this.userDetailsManager = userDetailsManager;
     }
 
     @PostMapping("/login")
@@ -48,4 +53,17 @@ public class LoginController {
 
     public record LoginRequest(String username, String password) {
     }
+
+    @PostMapping("logon")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void registrarUsuario(@RequestBody LogonRequest logonRequest) {
+        UserDetails user = User.builder()
+                .username(logonRequest.username)
+                .password("{noop}" + logonRequest.password)
+                .roles("USER").build();
+
+        this.userDetailsManager.createUser(user);
+    }
+
+    public record LogonRequest(String username, String password, String email) {}
 }
