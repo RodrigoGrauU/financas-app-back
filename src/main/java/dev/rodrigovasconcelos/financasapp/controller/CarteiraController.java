@@ -5,7 +5,7 @@ import dev.rodrigovasconcelos.financasapp.dto.CarteiraDto;
 import dev.rodrigovasconcelos.financasapp.entity.Carteira;
 import dev.rodrigovasconcelos.financasapp.mapper.CarteiraMapper;
 import dev.rodrigovasconcelos.financasapp.service.CarteiraService;
-import dev.rodrigovasconcelos.financasapp.service.impl.UsuarioServiceImpl;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
@@ -30,8 +30,6 @@ import java.util.Set;
 public class CarteiraController {
 
     private CarteiraService carteiraService;
-    private UsuarioServiceImpl usuarioService;
-
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Set<CarteiraComMesesAnoDto> listaCarteiras() {
@@ -40,7 +38,7 @@ public class CarteiraController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public CarteiraDto salvarCarteira(@RequestBody CarteiraDto carteiraDto) {
+    public CarteiraDto salvarCarteira(@Valid @RequestBody CarteiraDto carteiraDto) {
         return carteiraService.salvarCarteira(carteiraDto, getUsername());
     }
 
@@ -51,7 +49,7 @@ public class CarteiraController {
     }
 
     @PutMapping("/{carteiraId}")
-    public CarteiraDto atualizarCarteira(@PathVariable Long carteiraId, @RequestBody CarteiraDto carteiraDto) {
+    public CarteiraDto atualizarCarteira(@PathVariable Long carteiraId, @Valid @RequestBody CarteiraDto carteiraDto) {
         Carteira carteiraAtual = carteiraService.buscarOuFalhar(carteiraId);
         Carteira carteira = CarteiraMapper.INSTANCE.CarteiraDtoToCarteira(carteiraDto);
 

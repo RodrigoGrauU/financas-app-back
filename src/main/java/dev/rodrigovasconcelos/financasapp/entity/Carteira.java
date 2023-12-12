@@ -1,6 +1,7 @@
 package dev.rodrigovasconcelos.financasapp.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ public class Carteira {
     private Long id;
 
     @Column
+    @NotBlank
     private String nome;
 
     @Column
