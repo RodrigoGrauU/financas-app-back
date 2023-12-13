@@ -25,10 +25,11 @@ public class TransacaoRepositoryImpl {
         }
 
         if(mesTransacao != 0) {
-            stringQuery += "AND EXTRACT(MONTH FROM t.dataTransacao) = :mesTransacao";
+            stringQuery += "AND EXTRACT(MONTH FROM t.dataTransacao) = :mesTransacao ";
             listaParametros.put("mesTransacao", mesTransacao);
         }
 
+        stringQuery += "ORDER BY t.dataTransacao ";
         TypedQuery<Transacao> queryFinal =  entityManager.createQuery(stringQuery, Transacao.class);
         listaParametros.forEach(queryFinal::setParameter);
         return queryFinal.getResultList();
