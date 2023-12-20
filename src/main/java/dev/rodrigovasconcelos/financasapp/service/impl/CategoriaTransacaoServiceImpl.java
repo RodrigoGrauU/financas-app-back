@@ -20,7 +20,6 @@ public class CategoriaTransacaoServiceImpl implements CategoriaTransacaoService 
 
     @Override
     public Set<CategoriaTransacaoDto> listar(Long usuarioId) {
-        //TODO - ajustar o id do usuario
         Set<CategoriaTransacao> categorias = categoriaTransacaoRepository.findByUsuarioId(usuarioId);
         Set<CategoriaTransacaoDto> categoriasDto = new LinkedHashSet<>();
         categorias.forEach(categoria -> categoriasDto.add(CategoriaTransacaoMapper.INSTANCE
@@ -30,12 +29,9 @@ public class CategoriaTransacaoServiceImpl implements CategoriaTransacaoService 
     }
 
     @Override
-    public CategoriaTransacaoDto adicionar(CategoriaTransacaoDto categoriaTransacaoDto) {
+    public CategoriaTransacaoDto adicionar(CategoriaTransacaoDto categoriaTransacaoDto, Long usuarioId) {
         CategoriaTransacao categoriaTransacao = CategoriaTransacaoMapper.INSTANCE.categoriaTransacaoDtoToCategoriaTransacao(categoriaTransacaoDto);
-        //TODO - ajustar o id do usuario
-        if(categoriaTransacao.getUsuarioId() == null) {
-            categoriaTransacao.setUsuarioId(1L);
-        }
+        categoriaTransacao.setUsuarioId(usuarioId);
         return CategoriaTransacaoMapper.INSTANCE.categoriaTransacaoToCategoriaTransacaoDto(categoriaTransacaoRepository.save(categoriaTransacao));
     }
 

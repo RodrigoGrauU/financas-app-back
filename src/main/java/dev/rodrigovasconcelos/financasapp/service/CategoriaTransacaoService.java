@@ -8,7 +8,7 @@ import java.util.Set;
 public interface CategoriaTransacaoService {
     Set<CategoriaTransacaoDto> listar(Long usuarioId);
 
-    CategoriaTransacaoDto adicionar(CategoriaTransacaoDto categoriaTransacaoDto);
+    CategoriaTransacaoDto adicionar(CategoriaTransacaoDto categoriaTransacaoDto, Long usuarioId);
 
     CategoriaTransacaoDto atualizar(Long categoriaTransacaoId,CategoriaTransacaoDto categoriaTransacaoDto);
 

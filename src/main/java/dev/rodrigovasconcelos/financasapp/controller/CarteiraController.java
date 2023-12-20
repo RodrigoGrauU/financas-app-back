@@ -5,13 +5,12 @@ import dev.rodrigovasconcelos.financasapp.dto.CarteiraDto;
 import dev.rodrigovasconcelos.financasapp.entity.Carteira;
 import dev.rodrigovasconcelos.financasapp.mapper.CarteiraMapper;
 import dev.rodrigovasconcelos.financasapp.service.CarteiraService;
+import dev.rodrigovasconcelos.financasapp.service.impl.UsuarioServiceImpl;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,16 +29,17 @@ import java.util.Set;
 public class CarteiraController {
 
     private CarteiraService carteiraService;
+    private UsuarioServiceImpl usuarioService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Set<CarteiraComMesesAnoDto> listaCarteiras() {
-        return carteiraService.listaCarteiras(getUsername());
+        return carteiraService.listaCarteiras(usuarioService.getUserId());
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public CarteiraDto salvarCarteira(@Valid @RequestBody CarteiraDto carteiraDto) {
-        return carteiraService.salvarCarteira(carteiraDto, getUsername());
+        return carteiraService.salvarCarteira(carteiraDto, usuarioService.findUserByContext());
     }
 
     @DeleteMapping("/{carteiraId}")
@@ -54,11 +54,6 @@ public class CarteiraController {
         Carteira carteira = CarteiraMapper.INSTANCE.CarteiraDtoToCarteira(carteiraDto);
 
         BeanUtils.copyProperties(carteira, carteiraAtual, "id");
-        return carteiraService.salvarCarteira(CarteiraMapper.INSTANCE.carteiraToCarteiraDto(carteiraAtual), getUsername());
-    }
-
-    private String getUsername() {
-        SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
-        return securityContextHolderStrategy.getContext().getAuthentication().getName();
+        return carteiraService.salvarCarteira(CarteiraMapper.INSTANCE.carteiraToCarteiraDto(carteiraAtual), usuarioService.findUserByContext());
     }
 }

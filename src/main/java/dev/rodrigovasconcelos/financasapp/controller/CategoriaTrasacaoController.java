@@ -7,8 +7,6 @@ import dev.rodrigovasconcelos.financasapp.service.impl.UsuarioServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,14 +29,14 @@ public class CategoriaTrasacaoController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Set<CategoriaTransacaoDto> listar() {
-        Usuario usuario = usuarioService.findUserByUsername(getUsername());
+        Usuario usuario = usuarioService.findUserByContext();
         return categoriaTransacaoService.listar(usuario.getId());
     }
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
     public CategoriaTransacaoDto adicionar(@RequestBody CategoriaTransacaoDto categoriaTransacaoDto) {
-        return categoriaTransacaoService.adicionar(categoriaTransacaoDto);
+        return categoriaTransacaoService.adicionar(categoriaTransacaoDto, usuarioService.getUserId());
     }
 
     @PutMapping("/{categoriaTransacaoId}")
@@ -50,10 +48,5 @@ public class CategoriaTrasacaoController {
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void remover(@PathVariable Long categoriaTransacaoId) {
         categoriaTransacaoService.remover(categoriaTransacaoId);
-    }
-
-    private String getUsername() {
-        SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
-        return securityContextHolderStrategy.getContext().getAuthentication().getName();
     }
 }
