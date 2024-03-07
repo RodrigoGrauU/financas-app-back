@@ -3,6 +3,7 @@ package dev.rodrigovasconcelos.financasapp.service;
 import dev.rodrigovasconcelos.financasapp.dto.TransacaoDto;
 import dev.rodrigovasconcelos.financasapp.dto.TransacaoSalvarDto;
 
+import java.util.List;
 import java.util.Set;
 
 public interface TransacaoService {
@@ -13,4 +14,6 @@ public interface TransacaoService {
     void remover(Long transacaoId);
 
     TransacaoDto atualizar(Long transacaoId, TransacaoSalvarDto transacaoSalvarDto);
+
+    void salvar(List<TransacaoSalvarDto> transacoes);
 }

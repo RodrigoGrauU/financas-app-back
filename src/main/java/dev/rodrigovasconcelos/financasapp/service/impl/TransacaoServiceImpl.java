@@ -13,8 +13,10 @@ import dev.rodrigovasconcelos.financasapp.service.TransacaoService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -34,6 +36,7 @@ public class TransacaoServiceImpl implements TransacaoService {
         return transacaoDtos;
     }
 
+    @Transactional
     @Override
     public TransacaoDto salvar(TransacaoSalvarDto transacaoSalvarDto) {
         Transacao transacao = TransacaoMapper.INSTANCE.transacaoSalvarDtoToTransacao(transacaoSalvarDto);
@@ -44,12 +47,14 @@ public class TransacaoServiceImpl implements TransacaoService {
         return TransacaoMapper.INSTANCE.transacaoToTransacaoDto(transacaoRepository.save(transacao));
     }
 
+    @Transactional
     @Override
     public void remover(Long transacaoId) {
         Transacao transacao = this.buscarOuFalhar(transacaoId);
         transacaoRepository.delete(transacao);
     }
 
+    @Transactional
     @Override
     public TransacaoDto atualizar(Long transacaoId, TransacaoSalvarDto transacaoSalvarDto) {
         Transacao transacaoAtual = this.buscarOuFalhar(transacaoId);
@@ -60,6 +65,15 @@ public class TransacaoServiceImpl implements TransacaoService {
         transacaoAtual.setCarteira(carteira);
         transacaoAtual.setCategoriaTransacao(categoriaTransacao);
         return TransacaoMapper.INSTANCE.transacaoToTransacaoDto(transacaoRepository.save(transacaoAtual));
+    }
+
+    @Transactional
+    @Override
+    public void salvar(List<TransacaoSalvarDto> transacoes) {
+        List<Transacao> listaTransacoesEntity = transacoes.stream()
+                .map(transacao -> TransacaoMapper.INSTANCE.transacaoSalvarDtoToTransacao(transacao))
+                .toList();
+        transacaoRepository.saveAll(listaTransacoesEntity);
     }
 
     private Transacao buscarOuFalhar(Long transacaoId) {
