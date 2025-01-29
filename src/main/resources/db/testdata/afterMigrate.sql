@@ -1,10 +1,13 @@
+SET FOREIGN_KEY_CHECKS=0;
+
 delete from carteiras;
 delete from categoria_transacao;
 delete from transacoes;
-delete from usuario;
+delete from authorities;
+delete from usuarios;
 
-insert into usuario(id, email, username) values (1, 'testedata@data.com', 'root');
-
+insert into usuarios(id, email, username, password, ativo) values (1, 'testedata@data.com', 'root', '{noop}1234', 1);
+insert into authorities(user_id, authority) values (1, 'ROLE_USER');
 insert into categoria_transacao(id, descricao, nome, usuario_id) values (1, 'Gastos com Pets', 'Pets', 1);
 insert into categoria_transacao(id, descricao, nome, usuario_id) values (2, 'Gastos com Pets', 'Supermercado', 1);
 

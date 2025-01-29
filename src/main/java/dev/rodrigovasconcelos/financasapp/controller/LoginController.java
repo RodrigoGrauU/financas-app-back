@@ -1,5 +1,6 @@
 package dev.rodrigovasconcelos.financasapp.controller;
 
+import dev.rodrigovasconcelos.financasapp.service.impl.UsuarioServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
@@ -22,16 +23,19 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/v1/")
+@RequestMapping("/v1")
 public class LoginController {
     private final AuthenticationManager authenticationManager;
     private final SecurityContextHolderStrategy securityContextHolderStrategy = SecurityContextHolder.getContextHolderStrategy();
     private SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
     private UserDetailsManager userDetailsManager;
+    private UsuarioServiceImpl usuarioService;
 
-    public LoginController(AuthenticationManager authenticationManager, UserDetailsManager userDetailsManager) {
+    public LoginController(AuthenticationManager authenticationManager, UserDetailsManager userDetailsManager,
+                           UsuarioServiceImpl usuarioService) {
         this.authenticationManager = authenticationManager;
         this.userDetailsManager = userDetailsManager;
+        this.usuarioService = usuarioService;
     }
 
     @PostMapping("/login")
@@ -63,6 +67,7 @@ public class LoginController {
                 .roles("USER").build();
 
         this.userDetailsManager.createUser(user);
+        usuarioService.registrarEmailUsuario(logonRequest.username, logonRequest.email);
     }
 
     public record LogonRequest(String username, String password, String email) {}

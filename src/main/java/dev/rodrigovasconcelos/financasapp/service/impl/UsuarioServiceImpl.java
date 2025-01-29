@@ -7,6 +7,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.stereotype.Service;
 
+import java.util.function.Supplier;
+
 @Service
 public class UsuarioServiceImpl {
 
@@ -17,9 +19,7 @@ public class UsuarioServiceImpl {
     }
 
     public Usuario findUserByUsername(String username) {
-        return usuarioRepository.findByUsername(username).orElseThrow(
-                () -> new BusinessException("Usuário não encontrado")
-        );
+        return usuarioRepository.findByUsername(username).orElseThrow(usuarioNaoEncontradoException());
     }
 
     public String getUsername() {
@@ -33,5 +33,15 @@ public class UsuarioServiceImpl {
 
     public Long getUserId() {
         return this.findUserByContext().getId();
+    }
+
+    public void registrarEmailUsuario(String username, String email) {
+        Usuario usuario = usuarioRepository.findByUsername(username).orElseThrow(usuarioNaoEncontradoException());
+        usuario.setEmail(email);
+        usuarioRepository.save(usuario);
+    }
+
+    private Supplier<BusinessException> usuarioNaoEncontradoException() {
+        return () -> new BusinessException("Usuário não encontrado");
     }
 }
