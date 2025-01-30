@@ -1,5 +1,6 @@
 package dev.rodrigovasconcelos.financasapp.controller;
 
+import dev.rodrigovasconcelos.financasapp.repository.JwtUtil;
 import dev.rodrigovasconcelos.financasapp.service.impl.UsuarioServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -7,8 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolderStrategy;
 import org.springframework.security.core.userdetails.User;
@@ -30,27 +29,22 @@ public class LoginController {
     private SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
     private UserDetailsManager userDetailsManager;
     private UsuarioServiceImpl usuarioService;
+    private final JwtUtil jwtUtil;
 
     public LoginController(AuthenticationManager authenticationManager, UserDetailsManager userDetailsManager,
-                           UsuarioServiceImpl usuarioService) {
+                           UsuarioServiceImpl usuarioService, JwtUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.userDetailsManager = userDetailsManager;
         this.usuarioService = usuarioService;
+        this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<SessionResponse> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
-        Authentication authenticationRequest = UsernamePasswordAuthenticationToken
-                .unauthenticated(loginRequest.username(), loginRequest.password());
-        Authentication authenticationResponse = this.authenticationManager.authenticate(authenticationRequest);
-
-        SecurityContext context = securityContextHolderStrategy.createEmptyContext();
-        context.setAuthentication(authenticationResponse);
-        securityContextHolderStrategy.setContext(context);
-        securityContextRepository.saveContext(context, request, response);
-        SessionResponse sessionResponse = new SessionResponse(request.getSession().getId());
-        return ResponseEntity.ok(sessionResponse);
+    public ResponseEntity<TokenLoginResponse> login(@RequestBody LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) {
+         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.username, loginRequest.password));
+        String token = jwtUtil.generateToken(loginRequest.username);
+         return ResponseEntity.ok(new TokenLoginResponse(token));
     }
 
     public record SessionResponse(String sessionId) {}
@@ -71,4 +65,10 @@ public class LoginController {
     }
 
     public record LogonRequest(String username, String password, String email) {}
+
+    public record TokenLoginResponse(String token) {
+        public TokenLoginResponse(String token) {
+            this.token = token;
+        }
+    }
 }
