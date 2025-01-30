@@ -6,13 +6,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
 import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -39,10 +39,11 @@ public class SecurityConfig {
                 .cors(corsConf -> corsConf.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/v1/login").permitAll()
-                        .requestMatchers(("v1/logon")).permitAll()
+                        .requestMatchers("v1/logon").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults())
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 .logout(logout ->
                         logout.addLogoutHandler(new HeaderWriterLogoutHandler(new ClearSiteDataHeaderWriter(ClearSiteDataHeaderWriter.Directive.COOKIES))));
         return http.build();
@@ -50,7 +51,20 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsManager users() {
-        return new JdbcUserDetailsManager(dataSource);
+        JdbcUserDetailsManager userDetailsManager = new JdbcUserDetailsManager(dataSource);
+        userDetailsManager.setUsersByUsernameQuery("SELECT username, password, ativo from usuarios where username = ?");
+        userDetailsManager.setCreateUserSql("INSERT INTO usuarios(username, password, ativo) VALUES(?,?,?)");
+        userDetailsManager.setAuthoritiesByUsernameQuery("SELECT u.username, a.authority FROM authorities a " +
+                "JOIN usuarios u ON a.user_id = u.id " +
+                "WHERE u.username = ?");
+        userDetailsManager.setCreateAuthoritySql("INSERT INTO authorities(user_id, authority) " +
+                "VALUES(" +
+                "(SELECT id from usuarios where username = ?), ?)");
+        return userDetailsManager;
+    }
+
+    private JWTAuthenticationFilter jwtAuthenticationFilter() {
+        return new JWTAuthenticationFilter();
     }
 
     @Bean
